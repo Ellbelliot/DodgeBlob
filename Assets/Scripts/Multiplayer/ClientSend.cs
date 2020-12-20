@@ -32,15 +32,17 @@ public class ClientSend : MonoBehaviour
 	{
 		using (Packet _packet = new Packet((int)ClientPackets.playerMovement))
 		{
+			_packet.Write(_floatInputs.Length);
 			foreach (float _float in _floatInputs)
 			{
 				_packet.Write(_float);
 			}
+			_packet.Write(_boolInputs.Length);
 			foreach (bool _bool in _boolInputs)
 			{
 				_packet.Write(_bool);
 			}
-			_packet.Write(GameManager.instance.localPlayerPrefab.transform.rotation);
+			_packet.Write(GameManager.players[Client.instance.myId].head.transform.rotation);
 
 			SendUDPData(_packet);
 		}

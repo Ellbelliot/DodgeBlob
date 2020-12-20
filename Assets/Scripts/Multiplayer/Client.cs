@@ -250,7 +250,9 @@ public class Client : MonoBehaviour
 		packetHandlers = new Dictionary<int, PacketHandler>()
 		{
 			{ (int)ServerPackets.welcome, Clienthandle.Welcome },
-			{ (int)ServerPackets.spawnPlayer, Clienthandle.SpawnPlayer }
+			{ (int)ServerPackets.spawnPlayer, Clienthandle.SpawnPlayer },
+			{ (int)ServerPackets.playerPosition, Clienthandle.PlayerPosition },
+			{ (int)ServerPackets.playerRotation, Clienthandle.PlayerRotation },
 		};
 		Debug.Log("Initialized packets.");
 	}

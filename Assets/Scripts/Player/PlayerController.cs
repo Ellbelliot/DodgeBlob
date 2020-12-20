@@ -15,6 +15,10 @@ public class PlayerController : MonoBehaviour
 
 	private void Start()
 	{
+		SetMovement(Vector2.zero);
+		SetSprint(false);
+		SetJump(false);
+
 		// Runs proper functions when buttons are pressed
 		controls.Player.Movement.performed += ctx => SetMovement(ctx.ReadValue<Vector2>());
 		controls.Player.Movement.canceled += ctx => SetMovement(Vector2.zero);
