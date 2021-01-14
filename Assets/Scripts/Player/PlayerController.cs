@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+	// Animation
+	[SerializeField] private Animator anim;
+
 	// Input
 	private InputMaster controls;
 
@@ -43,6 +46,7 @@ public class PlayerController : MonoBehaviour
 	private void FixedUpdate()
 	{
 		SendInputToServer();
+		SendAnimationToServer();
 	}
 
 	public void SendInputToServer()
@@ -60,5 +64,22 @@ public class PlayerController : MonoBehaviour
 		};
 
 		ClientSend.PlayerMovement(_floatInputs, _boolInputs);
+	}
+
+	public void SendAnimationToServer()
+	{
+		bool[] _params = new bool[]
+		{
+			anim.GetBool("Peaking"),
+			anim.GetBool("Jumping"),
+			anim.GetBool("Falling"),
+			anim.GetBool("Land"),
+			anim.GetBool("Move"),
+			anim.GetBool("WallJumping")
+		};
+
+		float moveMultiplier = anim.GetFloat("MoveMultiplier");
+
+		ClientSend.PlayerAnimation(_params, moveMultiplier);
 	}
 }

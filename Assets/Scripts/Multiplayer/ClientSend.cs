@@ -47,5 +47,20 @@ public class ClientSend : MonoBehaviour
 			SendUDPData(_packet);
 		}
 	}
+
+	public static void PlayerAnimation(bool[] _params, float moveMultiplier)
+	{
+		using (Packet _packet = new Packet((int)ClientPackets.playerAnimation))
+		{
+			_packet.Write(_params.Length);
+			foreach (bool param in _params)
+			{
+				_packet.Write(param);
+			}
+			_packet.Write(moveMultiplier);
+
+			SendUDPData(_packet);
+		}
+	}
 	#endregion
 }

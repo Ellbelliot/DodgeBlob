@@ -8,4 +8,5 @@ public class PlayerManager : MonoBehaviour
     public string username;
 
     public GameObject head;
+    public Animator anim;
 }

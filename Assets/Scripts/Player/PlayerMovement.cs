@@ -279,15 +279,10 @@ public class PlayerMovement : MonoBehaviour
 	// and how fast we are moving forward, relative to where we're looking.
 	public Vector2 FindVelRelativeToLook()
 	{
-		float lookAngle = cam.transform.eulerAngles.y;
-		float moveAngle = Mathf.Atan2(rb.velocity.x, rb.velocity.z) * Mathf.Rad2Deg;
+		Vector3 flatForward = new Vector3(cam.transform.forward.x, cam.transform.forward.y, 0).normalized;
 
-		float forwardAngle = Mathf.DeltaAngle(lookAngle, moveAngle);
-		float rightAngle = 90 - forwardAngle;
-
-		float velMagnitude = rb.velocity.magnitude;
-		float forwardVel = velMagnitude * Mathf.Cos(forwardAngle * Mathf.Deg2Rad);
-		float rightVel = velMagnitude * Mathf.Cos(rightAngle * Mathf.Deg2Rad);
+		float rightVel = Vector3.Dot(rb.velocity, cam.transform.right);
+		float forwardVel = Vector3.Dot(rb.velocity, cam.transform.forward);
 
 		return new Vector2(rightVel, forwardVel);
 	}
