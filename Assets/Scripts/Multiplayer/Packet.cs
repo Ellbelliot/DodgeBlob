@@ -8,9 +8,19 @@ public enum ServerPackets
 {
     welcome = 1,
     spawnPlayer,
+    playerDisconnected,
     playerPosition,
     playerRotation,
-    playerAnimation
+    playerVelocity,
+    playerAnimation,
+    dodgeballPosition,
+    dodgeballVelocity,
+    dodgeballState,
+    playerGrab,
+    playerThrow,
+    playerDie,
+    playerRespawn,
+    gameEnd
 }
 
 /// <summary>Sent from client to server.</summary>
@@ -18,6 +28,7 @@ public enum ClientPackets
 {
     welcomeReceived = 1,
     playerMovement,
+    playerGrab,
     playerAnimation
 }
 

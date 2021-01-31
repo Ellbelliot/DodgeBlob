@@ -23,6 +23,7 @@ public class ClientSend : MonoBehaviour
 		{
 			_packet.Write(Client.instance.myId);
 			_packet.Write(UIManager.instance.usernameField.text);
+			_packet.Write(UIManager.instance.skinDropdown.value);
 
 			SendTCPData(_packet);
 		}
@@ -48,16 +49,31 @@ public class ClientSend : MonoBehaviour
 		}
 	}
 
-	public static void PlayerAnimation(bool[] _params, float moveMultiplier)
+	public static void PlayerGrab(bool[] _inputs, int _slotNum)
+	{
+		using (Packet _packet = new Packet((int)ClientPackets.playerGrab))
+		{
+			_packet.Write(_inputs.Length);
+			foreach (bool _input in _inputs)
+			{
+				_packet.Write(_input);
+			}
+			_packet.Write(_slotNum);
+
+			SendUDPData(_packet);
+		}
+	}
+
+	public static void PlayerAnimation(bool[] _params, float _moveMultiplier)
 	{
 		using (Packet _packet = new Packet((int)ClientPackets.playerAnimation))
 		{
 			_packet.Write(_params.Length);
-			foreach (bool param in _params)
+			foreach (bool _param in _params)
 			{
-				_packet.Write(param);
+				_packet.Write(_param);
 			}
-			_packet.Write(moveMultiplier);
+			_packet.Write(_moveMultiplier);
 
 			SendUDPData(_packet);
 		}

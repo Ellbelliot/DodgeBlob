@@ -3,13 +3,18 @@
 public class Dodgeball : MonoBehaviour
 {
 	public GameObject player;
+	public int id;
 
 	[SerializeField] private Material normalMat;
 	[SerializeField] private Material activatedMat;
 
 	public bool activated = false;
-
 	public bool immunity = false;
+
+	private void Awake()
+	{
+		GameManager.dodgeballs.Add(id, this);
+	}
 
 	private void Update()
 	{
@@ -22,17 +27,21 @@ public class Dodgeball : MonoBehaviour
 		}
 	}
 
-	private void OnCollisionStay(Collision other)
+	private void OnCollisionEnter(Collision other)
 	{
-		if (other.gameObject.tag == "Ground" && activated && !immunity)
+		if (other.gameObject.CompareTag("Ground") && activated && !immunity)
 		{
 			activated = false;
 			player = null;
 		}
-		else if (other.gameObject.tag == "Player" && other.gameObject != player && activated && !immunity)
+	}
+
+	private void OnCollisionStay(Collision other)
+	{
+		if (other.gameObject.CompareTag("Ground") && activated && !immunity)
 		{
-			float power = Mathf.RoundToInt(GetComponent<Rigidbody>().velocity.magnitude);
-			Debug.Log(player.name + " hit " + other.gameObject.name + " for " + power + " damage.");
+			activated = false;
+			player = null;
 		}
 	}
 

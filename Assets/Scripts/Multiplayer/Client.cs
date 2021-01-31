@@ -8,7 +8,7 @@ using System;
 public class Client : MonoBehaviour
 {
 	public static Client instance;
-	public static int dataBufferSize = 4096;
+	public static int dataBufferSize = 8192;
 
 	public string ip = "127.0.0.1";
 	public int port = 12345;
@@ -34,12 +34,6 @@ public class Client : MonoBehaviour
 		}
 	}
 
-	private void Start()
-	{
-		tcp = new TCP();
-		udp = new UDP();
-	}
-
 	private void OnApplicationQuit()
 	{
 		Disconnect();
@@ -47,6 +41,9 @@ public class Client : MonoBehaviour
 
 	public void ConnectToServer()
 	{
+		tcp = new TCP();
+		udp = new UDP();
+
 		InitializeClientData();
 
 		isConnected = true;
@@ -70,7 +67,7 @@ public class Client : MonoBehaviour
 			};
 
 			receiveBuffer = new byte[dataBufferSize];
-			socket.BeginConnect(IPAddress.Parse(instance.ip), instance.port, ConnectCallback, socket);
+			socket.BeginConnect(instance.ip, instance.port, ConnectCallback, socket);
 		}
 
 		private void ConnectCallback(IAsyncResult _result)
@@ -138,7 +135,7 @@ public class Client : MonoBehaviour
 			if (receivedData.UnreadLength() >= 4)
 			{
 				_packetLength = receivedData.ReadInt();
-				if (_packetLength < 1)
+				if (_packetLength <= 0)
 				{
 					return true;
 				}
@@ -161,7 +158,7 @@ public class Client : MonoBehaviour
 				if (receivedData.UnreadLength() >= 4)
 				{
 					_packetLength = receivedData.ReadInt();
-					if (_packetLength < 1)
+					if (_packetLength <= 0)
 					{
 						return true;
 					}
@@ -280,9 +277,19 @@ public class Client : MonoBehaviour
 		{
 			{ (int)ServerPackets.welcome, Clienthandle.Welcome },
 			{ (int)ServerPackets.spawnPlayer, Clienthandle.SpawnPlayer },
+			{ (int)ServerPackets.playerDisconnected, Clienthandle.PlayerDisconnected },
 			{ (int)ServerPackets.playerPosition, Clienthandle.PlayerPosition },
 			{ (int)ServerPackets.playerRotation, Clienthandle.PlayerRotation },
+			{ (int)ServerPackets.playerVelocity, Clienthandle.PlayerVelocity },
 			{ (int)ServerPackets.playerAnimation, Clienthandle.PlayerAnimation },
+			{ (int)ServerPackets.dodgeballPosition, Clienthandle.DodgeballPosition },
+			{ (int)ServerPackets.dodgeballVelocity, Clienthandle.DodgeballVelocity },
+			{ (int)ServerPackets.dodgeballState, Clienthandle.DodgeballState },
+			{ (int)ServerPackets.playerGrab, Clienthandle.PlayerGrab },
+			{ (int)ServerPackets.playerThrow, Clienthandle.PlayerThrow },
+			{ (int)ServerPackets.playerDie, Clienthandle.PlayerDie },
+			{ (int)ServerPackets.playerRespawn, Clienthandle.PlayerRespawn },
+			{ (int)ServerPackets.gameEnd, Clienthandle.GameEnd }
 		};
 		Debug.Log("Initialized packets.");
 	}

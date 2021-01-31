@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
 using TMPro;
 
@@ -12,6 +11,10 @@ public class UIManager : MonoBehaviour
 
 	public GameObject startMenu;
 	public TMP_InputField usernameField;
+	public TMP_InputField ipField;
+	public TMP_Dropdown skinDropdown;
+	public Image previewImage;
+	public Sprite[] previewImages;
 
 	private void Awake()
 	{
@@ -26,11 +29,19 @@ public class UIManager : MonoBehaviour
 		}
 	}
 
+	public void ChangePreview()
+	{
+		previewImage.sprite = previewImages[skinDropdown.value];
+	}
+
 	public void ConnectToServer()
 	{
-		startMenu.SetActive(false);
-		usernameField.interactable = false;
-		SceneManager.LoadScene("SampleScene");
-		Client.instance.ConnectToServer();
+		if (usernameField.text != "" && ipField.text != "")
+		{
+			startMenu.SetActive(false);
+			usernameField.interactable = false;
+			Client.instance.ip = ipField.text;
+			SceneManager.LoadScene("SampleScene");
+		}
 	}
 }

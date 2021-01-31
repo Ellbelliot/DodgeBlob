@@ -33,15 +33,15 @@ public class PlayerGrab : MonoBehaviour
 
 	private Rigidbody body;
 
-	private GameObject selectedDodgeball;
+	[SerializeField] private GameObject selectedDodgeball;
 
-	private GameObject dodgeball1;
-	private GameObject dodgeball2;
-	private GameObject dodgeball3;
+	[SerializeField] private GameObject dodgeball1;
+	[SerializeField] private GameObject dodgeball2;
+	[SerializeField] private GameObject dodgeball3;
 
-	private bool grabbing = false;
-	private bool holding = false;
-	private bool charging = false;
+	[SerializeField] private bool grabbing = false;
+	[SerializeField] private bool holding = false;
+	[SerializeField] private bool charging = false;
 
 	private InputMaster controls;
 
@@ -66,7 +66,6 @@ public class PlayerGrab : MonoBehaviour
 		controls.Player.Grab.canceled += ctx => ResetGrab();
 
 		controls.Player.Shoot.performed += ctx => Charge();
-		controls.Player.Shoot.canceled += ctx => Throw();
 
 		controls.Player.Slot1.performed += ctx => SwitchSlot(1);
 		controls.Player.Slot2.performed += ctx => SwitchSlot(2);
@@ -100,10 +99,11 @@ public class PlayerGrab : MonoBehaviour
 		charging = true;
 	}
 
-	private void Throw()
+	public void Throw(int _slot)
 	{
 		if (!holding) return;
 
+		SwitchSlot(_slot);
 		grabAnim.SetBool("Charging", false);
 		charging = false;
 		grabbing = false;
@@ -123,8 +123,7 @@ public class PlayerGrab : MonoBehaviour
 			selectedDodgeball.GetComponent<Rigidbody>().velocity *= 1 / 2;
 		}
 
-		selectedDodgeball = null;
-		ChangeDodgeball(null);
+		ChangeDodgeball(null, _slot);
 		throwSpeed = minThrowSpeed;
 		chargeMeter.value = 0;
 		chargeMeter.gameObject.SetActive(false);
@@ -153,13 +152,17 @@ public class PlayerGrab : MonoBehaviour
 
 	private void ChangeSlot(GameObject obj)
 	{
-		if (selectedDodgeball != null) { selectedDodgeball.SetActive(false); }
 		selectedDodgeball = obj;
 
-		if (obj != null) { selectedDodgeball.SetActive(true); }
-
-		if (obj != null) { holding = true; }
-		else { holding = false; }
+		if (obj != null) 
+		{ 
+			holding = true;
+			grabAnim.SetBool("Reaching", false);
+		}
+		else 
+		{ 
+			holding = false; 
+		}
 
 		grabbing = false;
 		charging = false;
@@ -183,9 +186,13 @@ public class PlayerGrab : MonoBehaviour
 		}
 	}
 
-	private void ChangeDodgeball(GameObject newDodgeball)
+	private void ChangeDodgeball(GameObject newDodgeball, int slot)
 	{
-		if (slotAnim.GetInteger("Selected") == 3)
+		if (slot != slotAnim.GetInteger("Selected"))
+		{
+			SwitchSlot(slot);
+		}
+		if (slot == 3)
 		{
 			dodgeball3 = newDodgeball;
 			if (newDodgeball != null)
@@ -200,7 +207,7 @@ public class PlayerGrab : MonoBehaviour
 				dodgeball3Silhouette.GetComponent<Image>().color = silhouetteColor;
 			}
 		}
-		if (slotAnim.GetInteger("Selected") == 2)
+		if (slot == 2)
 		{
 			dodgeball2 = newDodgeball;
 			if (newDodgeball != null)
@@ -215,7 +222,7 @@ public class PlayerGrab : MonoBehaviour
 				dodgeball2Silhouette.GetComponent<Image>().color = silhouetteColor;
 			}
 		}
-		if (slotAnim.GetInteger("Selected") == 1)
+		if (slot == 1)
 		{
 			dodgeball1 = newDodgeball;
 			if (newDodgeball != null)
@@ -235,36 +242,81 @@ public class PlayerGrab : MonoBehaviour
 
 	private void Update()
 	{
-		if (grabbing)
-		{
-			FindGrab();
-		}
 		if (charging)
 		{
 			ChargeThrowPower();
 		}
+		if (selectedDodgeball)
+		{
+			selectedDodgeball.transform.localPosition = Vector3.zero;
+		}
 	}
 
-	void FindGrab()
+	public void DropDodgeballs()
 	{
-		if (Physics.CheckSphere(grab.transform.position, grabRange, grabMask))
+		if (dodgeball1 != null)
 		{
-			Collider[] colliders = Physics.OverlapSphere(grab.transform.position, grabRange, grabMask);
-
-			colliders[0].transform.SetParent(grab.transform);
-			colliders[0].transform.localPosition = Vector3.zero;
-			colliders[0].GetComponent<Dodgeball>().activated = false;
-			colliders[0].GetComponent<Dodgeball>().immunity = false;
-			colliders[0].enabled = false;
-			colliders[0].gameObject.GetComponent<Rigidbody>().isKinematic = true;
-			colliders[0].gameObject.GetComponent<Rigidbody>().detectCollisions = true;
-
-			ChangeDodgeball(colliders[0].gameObject);
-			grabAnim.SetBool("Reaching", false);
-
-			holding = true;
-			grabbing = false;
+			dodgeball1.SetActive(true);
+			dodgeball1.transform.parent = null;
+			dodgeball1.GetComponent<Collider>().enabled = true;
+			dodgeball1.GetComponent<Dodgeball>().activated = true;
+			dodgeball1.GetComponent<Dodgeball>().immunity = true;
+			dodgeball1.GetComponent<Rigidbody>().isKinematic = false;
+			dodgeball1.GetComponent<Rigidbody>().detectCollisions = true;
+			dodgeball1 = null;
+			dodgeball1Silhouette.GetComponent<Image>().sprite = silhouetteSprite;
+			dodgeball1Silhouette.GetComponent<Image>().color = silhouetteColor;
 		}
+		if (dodgeball2 != null)
+		{
+			dodgeball2.SetActive(true);
+			dodgeball2.transform.parent = null;
+			dodgeball2.GetComponent<Collider>().enabled = true;
+			dodgeball2.GetComponent<Dodgeball>().activated = true;
+			dodgeball2.GetComponent<Dodgeball>().immunity = true;
+			dodgeball2.GetComponent<Rigidbody>().isKinematic = false;
+			dodgeball2.GetComponent<Rigidbody>().detectCollisions = true;
+			dodgeball2 = null;
+			dodgeball2Silhouette.GetComponent<Image>().sprite = silhouetteSprite;
+			dodgeball2Silhouette.GetComponent<Image>().color = silhouetteColor;
+		}
+		if (dodgeball3 != null)
+		{
+			dodgeball3.SetActive(true);
+			dodgeball3.transform.parent = null;
+			dodgeball3.GetComponent<Collider>().enabled = true;
+			dodgeball3.GetComponent<Dodgeball>().activated = true;
+			dodgeball3.GetComponent<Dodgeball>().immunity = true;
+			dodgeball3.GetComponent<Rigidbody>().isKinematic = false;
+			dodgeball3.GetComponent<Rigidbody>().detectCollisions = true;
+			dodgeball3 = null;
+			dodgeball3Silhouette.GetComponent<Image>().sprite = silhouetteSprite;
+			dodgeball3Silhouette.GetComponent<Image>().color = silhouetteColor;
+		}
+		if (selectedDodgeball != null)
+		{
+			selectedDodgeball = null;
+		}
+
+		slotAnim.SetInteger("Selected", 0);
+	}
+
+	public void GrabDodgeball(GameObject dodgeball, int slot)
+	{
+		dodgeball.transform.SetParent(grab.transform);
+		dodgeball.transform.localPosition = Vector3.zero;
+		dodgeball.GetComponent<Dodgeball>().activated = false;
+		dodgeball.GetComponent<Dodgeball>().immunity = false;
+		dodgeball.GetComponent<Dodgeball>().player = gameObject;
+		dodgeball.GetComponent<Collider>().enabled = false;
+		dodgeball.GetComponent<Rigidbody>().isKinematic = true;
+		dodgeball.GetComponent<Rigidbody>().detectCollisions = true;
+
+		ChangeDodgeball(dodgeball, slot);
+		grabAnim.SetBool("Reaching", false);
+
+		holding = true;
+		grabbing = false;
 	}
 
 	void ChargeThrowPower()

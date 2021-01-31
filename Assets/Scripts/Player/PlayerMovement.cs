@@ -131,7 +131,7 @@ public class PlayerMovement : MonoBehaviour
 
 	private void StopJump() => jumping = false;
 
-	private void LateUpdate()
+	private void FixedUpdate()
 	{
 		// Checks if we're on the ground
 		grounded = Physics.CheckCapsule(col.bounds.center, new Vector3(col.bounds.center.x, col.bounds.min.y, col.bounds.center.z), col.radius * 0.35f, groundLayers);
@@ -279,10 +279,10 @@ public class PlayerMovement : MonoBehaviour
 	// and how fast we are moving forward, relative to where we're looking.
 	public Vector2 FindVelRelativeToLook()
 	{
-		Vector3 flatForward = new Vector3(cam.transform.forward.x, cam.transform.forward.y, 0).normalized;
+		Vector3 flatForward = new Vector3(cam.transform.forward.x, 0, cam.transform.forward.z).normalized;
 
 		float rightVel = Vector3.Dot(rb.velocity, cam.transform.right);
-		float forwardVel = Vector3.Dot(rb.velocity, cam.transform.forward);
+		float forwardVel = Vector3.Dot(rb.velocity, flatForward);
 
 		return new Vector2(rightVel, forwardVel);
 	}
